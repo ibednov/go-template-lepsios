@@ -1,0 +1,44 @@
+services:
+  api:
+    build:
+      context: ../..
+      dockerfile: deployments/res/Dockerfile
+    container_name: ${APP_CONTAINER_NAME:-go-template-lepsios-api}
+    ports:
+      - "${HTTP_HOST_PORT:-8080}:${PORT:-8080}"
+    environment:
+      PORT: ${PORT:-8080}
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      SERVICE_NAME: ${SERVICE_NAME:-go-template-lepsios}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_SSL_MODE: ${DB_SSL_MODE:-require}
+      DB_OPTIONAL: ${DB_OPTIONAL:-false}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_DB: ${REDIS_DB:-0}
+      REDIS_OPTIONAL: ${REDIS_OPTIONAL:-false}
+      FILES_DRIVER: ${FILES_DRIVER:-local}
+      FILES_LOCAL_DIR: ${FILES_LOCAL_DIR:-/app/var/files}
+      FILES_S3_ENDPOINT: ${FILES_S3_ENDPOINT:-}
+      FILES_S3_ACCESS_KEY: ${FILES_S3_ACCESS_KEY:-}
+      FILES_S3_SECRET_KEY: ${FILES_S3_SECRET_KEY:-}
+      FILES_S3_BUCKET: ${FILES_S3_BUCKET:-template}
+      FILES_S3_REGION: ${FILES_S3_REGION:-us-east-1}
+      FILES_S3_USE_SSL: ${FILES_S3_USE_SSL:-false}
+      FILES_S3_PUBLIC_URL: ${FILES_S3_PUBLIC_URL:-}
+      MIGRATION_RUN: ${MIGRATION_RUN:-true}
+      MIGRATION_BACKUP: ${MIGRATION_BACKUP:-true}
+      MIGRATION_BACKUP_PREFIX: ${MIGRATION_BACKUP_PREFIX:-backups/pre-migrate}
+    restart: unless-stopped
+    volumes:
+      - template_files:/app/var/files
+
+volumes:
+  template_files:

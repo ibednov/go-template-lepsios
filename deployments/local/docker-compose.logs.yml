@@ -1,0 +1,37 @@
+name: go-template-lepsios-logs
+
+services:
+  logs:
+    image: victoriametrics/victoria-logs:v1.50.0
+    container_name: go-template-lepsios-logs
+    ports:
+      - "127.0.0.1:${LOG_UI_PORT:-9428}:9428"
+    command:
+      - -storageDataPath=/vlogs
+      - -retentionPeriod=7d
+    volumes:
+      - victoria_logs_data:/vlogs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:9428/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  vector:
+    image: timberio/vector:0.46.0-debian
+    container_name: go-template-lepsios-vector
+    ports:
+      - "127.0.0.1:${LOG_VECTOR_PORT:-8687}:8687"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - ../../vector.toml:/etc/vector/vector.toml:ro
+    command: ["--config", "/etc/vector/vector.toml"]
+    depends_on:
+      logs:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  victoria_logs_data:

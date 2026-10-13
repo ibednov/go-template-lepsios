@@ -1,0 +1,48 @@
+name: go-template-lepsios
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ${DB_CONTAINER_NAME:-go-template-lepsios-postgres}
+    environment:
+      POSTGRES_USER: ${DB_USER:-template}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-template}
+      POSTGRES_DB: ${DB_NAME:-template}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-template} -d ${DB_NAME:-template}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - template-tier
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: ${REDIS_CONTAINER_NAME:-go-template-lepsios-redis}
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - template-tier
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  template-tier:
+    name: go-template-lepsios-tier
+    driver: bridge

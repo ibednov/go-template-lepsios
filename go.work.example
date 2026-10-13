@@ -1,0 +1,14 @@
+go 1.27
+
+use (
+	.
+	../go-lepsios/config
+	../go-lepsios/db
+	../go-lepsios/files
+	../go-lepsios/httpx
+	../go-lepsios/i18n
+	../go-lepsios/log
+	../go-lepsios/migrate
+	../go-lepsios/redis
+	../go-lepsios/apperr
+)

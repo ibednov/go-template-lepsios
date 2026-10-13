@@ -1,0 +1,43 @@
+[sources.docker]
+type = "docker_logs"
+
+[sources.host_app]
+type = "http_server"
+address = "0.0.0.0:8687"
+encoding = "json"
+
+[transforms.normalize]
+type = "remap"
+inputs = ["docker", "host_app"]
+source = '''
+if exists(.message) && is_string(.message) {
+  parsed, err = parse_json(.message)
+  if err == null && is_object(parsed) {
+    . = merge!(., parsed)
+  }
+}
+if !exists(.source_type) || .source_type == null {
+  .source_type = "host"
+}
+if !exists(.service) || .service == null {
+  .service = "go-template-lepsios"
+}
+'''
+
+[sinks.vlogs]
+type = "elasticsearch"
+inputs = ["normalize"]
+endpoints = ["http://logs:9428/insert/elasticsearch/"]
+mode = "bulk"
+api_version = "v8"
+compression = "gzip"
+
+[sinks.vlogs.healthcheck]
+enabled = false
+
+[sinks.vlogs.request.headers]
+AccountID = "0"
+ProjectID = "0"
+VL-Stream-Fields = "source_type,service,container_name"
+VL-Time-Field = "timestamp,ts"
+VL-Msg-Field = "message,msg,_msg"

@@ -79,3 +79,7 @@ Backup uses the same `files.Adapter` as the app (local dir or S3/MinIO). Fail cl
 | `MIGRATION_*` | run on start + pre-migrate backup |
 | `APP_*` / `*_CONTAINER_NAME` | local compose names |
 
+
+## License
+
+[PolyForm Noncommercial License 1.0.0](LICENSE). Free for noncommercial use; commercial use requires the author's written permission — contact via [alexbednov.dev](https://alexbednov.dev). See [CONTRIBUTING.md](CONTRIBUTING.md).
